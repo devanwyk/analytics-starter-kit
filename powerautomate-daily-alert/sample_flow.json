@@ -1,0 +1,83 @@
+{
+  "name": "DailyRedshiftAlert",
+  "type": "Microsoft.Flow/flows",
+  "properties": {
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {},
+      "triggers": {
+        "Recurrence": {
+          "type": "Recurrence",
+          "recurrence": {
+            "frequency": "Day",
+            "interval": 1,
+            "startTime": "2026-05-18T08:00:00Z",
+            "timeZone": "UTC"
+          }
+        }
+      },
+      "actions": {
+        "Execute_Redshift_Query": {
+          "runAfter": {},
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_amazonredshift",
+              "operationId": "ExecuteQuery",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_amazonredshift"
+            },
+            "parameters": {
+              "dataset": "SELECT SUM(sales_amount) AS daily_sales FROM analytics.fact_sales WHERE order_date = CURRENT_DATE;"
+            }
+          }
+        },
+        "Condition": {
+          "runAfter": {
+            "Execute_Redshift_Query": [
+              "Succeeded"
+            ]
+          },
+          "type": "If",
+          "expression": {
+            "equals": [
+              "@float(body('Execute_Redshift_Query')?['resultSets']?[0]?['rows']?[0]?[0])",
+              10000
+            ]
+          },
+          "actions": {
+            "Send_Email_Alert": {
+              "runAfter": {},
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_office365",
+                  "operationId": "SendEmailV2",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365"
+                },
+                "parameters": {
+                  "to": "user@example.com",
+                  "subject": "Daily Sales Alert",
+                  "body": "Daily sales are below threshold: @{float(body('Execute_Redshift_Query')?['resultSets']?[0]?['rows']?[0]?[0])}"
+                }
+              }
+            }
+          },
+          "else": {
+            "actions": {
+              "Log_OK": {
+                "runAfter": {},
+                "type": "Compose",
+                "inputs": {
+                  "message": "Daily sales are within expected range."
+                }
+              }
+            }
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "parameters": {}
+  }
+}
