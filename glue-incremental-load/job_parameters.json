@@ -1,0 +1,11 @@
+{
+  "SOURCE_TYPE": "jdbc",
+  "JDBC_CONNECTION_NAME": "jdbc/sqlserver-source",
+  "SOURCE_QUERY": "SELECT SaleID, OrderDate, ProductKey, CustomerKey, Quantity, SalesAmount, DiscountAmount, LastUpdatedTS FROM dbo.FactSales",
+  "TARGET_REDSHIFT_JDBC_URL": "jdbc:redshift://mycluster.abc123.us-east-1.redshift.amazonaws.com:5439/dev?user=etl_user&password=********",
+  "TARGET_TABLE": "analytics.fact_sales",
+  "WATERMARK_COLUMN": "LastUpdatedTS",
+  "TEMP_S3_DIR": "s3://my-analytics-bucket/temp/glue_incremental/",
+  "IAM_ROLE_FOR_REDSHIFT": "arn:aws:iam::123456789012:role/GlueRedshiftAccess",
+  "DELETE_TEMP_FILES": "true"
+}
