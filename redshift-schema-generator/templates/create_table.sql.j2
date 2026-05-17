@@ -1,0 +1,15 @@
+CREATE TABLE {{ schema_name }}.{{ table_name }} (
+{% for col in columns %}
+    {{ col.name }} {{ col.type }}{% if col.length is defined %}({{ col.length }}){% endif %}{% if col.precision is defined and col.scale is defined %}({{ col.precision }},{{ col.scale }}){% endif %}{% if not col.nullable %} NOT NULL{% endif %}{% if loop.last %}{% else %},{% endif %}
+{% endfor %}
+{% if primary_key is defined %}
+) 
+{% else %}
+);
+{% endif %}
+{% if diststyle is defined %}
+DISTSTYLE {{ diststyle }};
+{% endif %}
+{% if sortkey is defined and sortkey | length > 0 %}
+SORTKEY ({{ sortkey | join(', ') }});
+{% endif %}

@@ -1,0 +1,102 @@
+name: sales_analytics
+tables:
+  - name: fact_sales
+    columns:
+      - name: sale_id
+        type: integer
+        nullable: false
+        primary_key: true
+      - name: order_date
+        type: date
+        nullable: false
+      - name: product_key
+        type: integer
+        nullable: false
+      - name: customer_key
+        type: integer
+        nullable: false
+      - name: quantity
+        type: integer
+        nullable: false
+      - name: sales_amount
+        type: decimal
+        precision: 18
+        scale: 2
+        nullable: false
+      - name: discount_amount
+        type: decimal
+        precision: 18
+        scale: 2
+        nullable: true
+    diststyle: EVEN
+    sortkey:
+      - order_date
+  - name: dim_product
+    columns:
+      - name: product_key
+        type: integer
+        nullable: false
+        primary_key: true
+      - name: product_name
+        type: string
+        length: 200
+        nullable: false
+      - name: product_category
+        type: string
+        length: 100
+        nullable: true
+      - name: brand
+        type: string
+        length: 100
+        nullable: true
+    diststyle: ALL
+  - name: dim_customer
+    columns:
+      - name: customer_key
+        type: integer
+        nullable: false
+        primary_key: true
+      - name: first_name
+        type: string
+        length: 50
+        nullable: false
+      - name: last_name
+        type: string
+        length: 50
+        nullable: false
+      - name: email
+        type: string
+        length: 255
+        nullable: true
+      - name: phone
+        type: string
+        length: 20
+        nullable: true
+    diststyle: ALL
+  - name: dim_date
+    columns:
+      - name: date_key
+        type: date
+        nullable: false
+        primary_key: true
+      - name: day_of_week
+        type: integer
+        nullable: false
+      - name: day_name
+        type: string
+        length: 10
+        nullable: false
+      - name: month
+        type: integer
+        nullable: false
+      - name: month_name
+        type: string
+        length: 10
+        nullable: false
+      - name: quarter
+        type: integer
+        nullable: false
+      - name: year
+        type: integer
+        nullable: false
+    diststyle: ALL
